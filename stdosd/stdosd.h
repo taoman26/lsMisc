@@ -1782,10 +1782,16 @@ namespace Ambiesoft {
 		{
 			return stdGetenvImpl(varname);
 		}
-#else
+#elif defined(__linux__)
         inline std::string stdGetenv(const char* varname)
         {
             return secure_getenv(varname);
+        }
+#else
+        inline std::string stdGetenv(const char* varname)
+        {
+            const char* val = getenv(varname);
+            return val ? val : "";
         }
 #endif
 
