@@ -22,7 +22,9 @@
 //SUCH DAMAGE.
 
 #include <unistd.h>
+#ifdef __linux__
 #include <sys/syscall.h>   /* For SYS_xxx definitions */
+#endif
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -40,7 +42,12 @@ namespace Process {
 
 static inline int ioprio_set(int which, int who, int ioprio)
 {
+#ifdef __linux__
     return syscall(SYS_ioprio_set, which, who, ioprio);
+#else
+    (void)which; (void)who; (void)ioprio;
+    return -1;
+#endif
 }
 
 enum {

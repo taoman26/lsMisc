@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include <stdio.h>
 
@@ -108,9 +109,13 @@ QSet<int> GetAllProcessIDs()
     {
         while ((ent = readdir (dir)) != nullptr)
         {
-            if(ent->d_type == DT_DIR && isNumber(ent->d_name))
+            if(isNumber(ent->d_name))
             {
-                result.insert(atoi(ent->d_name));
+                struct stat st;
+                char statpath[512];
+                snprintf(statpath, sizeof(statpath), "/proc/%s", ent->d_name);
+                if(stat(statpath, &st) == 0 && S_ISDIR(st.st_mode))
+                    result.insert(atoi(ent->d_name));
             }
         }
         closedir (dir);
